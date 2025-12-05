@@ -1049,38 +1049,53 @@ function init() {
 
     // Listen for auth state changes
     auth.onAuthStateChanged(async (user) => {
-        currentUser = user;
-        updateUserUI(user);
+        try {
+            currentUser = user;
+            updateUserUI(user);
 
-        if (user) {
-            // User logged in - subscribe to Firestore
-            if (unsubscribeFirestore) {
-                unsubscribeFirestore();
-            }
+            if (user) {
+                // User logged in - subscribe to Firestore
+                if (unsubscribeFirestore) {
+                    unsubscribeFirestore();
+                }
 
-            // Check if user has data, if not initialize
-            const userDocRef = db.collection('users').doc(user.uid);
-            const docSnap = await userDocRef.get();
+                try {
+                    // Check if user has data, if not initialize
+                    const userDocRef = db.collection('users').doc(user.uid);
+                    const docSnap = await userDocRef.get();
 
-            if (!docSnap.exists) {
-                // Migrate local storage data to Firestore if any
+                    if (!docSnap.exists) {
+                        // Migrate local storage data to Firestore if any
+                        loadFromStorage();
+                        await initializeUserData(user.uid);
+                        await saveToFirestore();
+                    }
+
+                    subscribeToFirestore(user.uid);
+                } catch (firestoreError) {
+                    console.error('Firestore error:', firestoreError);
+                    // Fallback to local storage if Firestore fails
+                    loadFromStorage();
+                    renderAll();
+                    showToast('서버 연결 실패. 로컬 데이터를 사용합니다.');
+                }
+            } else {
+                // User logged out - use local storage
+                if (unsubscribeFirestore) {
+                    unsubscribeFirestore();
+                    unsubscribeFirestore = null;
+                }
                 loadFromStorage();
-                await initializeUserData(user.uid);
-                await saveToFirestore();
+                renderAll();
             }
-
-            subscribeToFirestore(user.uid);
-        } else {
-            // User logged out - use local storage
-            if (unsubscribeFirestore) {
-                unsubscribeFirestore();
-                unsubscribeFirestore = null;
-            }
+        } catch (error) {
+            console.error('Auth error:', error);
+            // Fallback to local storage if auth fails
             loadFromStorage();
             renderAll();
+        } finally {
+            hideLoading();
         }
-
-        hideLoading();
     });
 }
 
