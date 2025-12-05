@@ -34,15 +34,26 @@ const MUSIC_DATABASE = {
         'Reggae', 'Blues', 'Country', 'Funk', 'Soul', 'Disco'
     ],
 
-    // Korean artists list for prioritization
+    // Korean artists list for prioritization (by nationality, not name)
     koreanArtists: [
+        // K-Pop Groups
         'BTS', 'BLACKPINK', 'NewJeans', 'aespa', 'Stray Kids', 'IVE', 'LE SSERAFIM', 'SEVENTEEN', 'NCT', 'Red Velvet', 'EXO', 'TWICE', '(G)I-DLE', 'ITZY', 'TXT',
-        '혁오', '실리카겔', '새소년', '잔나비', 'HYUKOH', '검정치마', '선우정아', '백예린', '오혁', '박혜진', '이랑', '황소윤', 'CIFIKA', '키라라',
-        '자이언티', '딘', 'DEAN', '크러쉬', 'Crush', 'pH-1', '박재범', 'Jay Park', '염따', '창모', 'CHANGMO', 'The Quiett', '빈지노', 'Beenzino', '식케이', 'Sik-K', '기리보이', 'Giriboy', '우원재', '코드 쿤스트',
+        'NMIXX', 'tripleS', 'KISS OF LIFE', 'ILLIT', 'BABYMONSTER',
+        // Korean Indie/Rock
+        '혁오', 'HYUKOH', '실리카겔', '새소년', '잔나비', '검정치마', '선우정아', '백예린', '오혁', '박혜진', '이랑', '황소윤', 'CIFIKA', '키라라', '세이수미', '카더가든', '짙은', '오왠', '샘김',
+        // Korean Hip-Hop/R&B
+        '자이언티', 'Zion.T', '딘', 'DEAN', '크러쉬', 'Crush', 'pH-1', '박재범', 'Jay Park', '염따', '창모', 'CHANGMO', 'The Quiett', '빈지노', 'Beenzino', '식케이', 'Sik-K', '기리보이', 'Giriboy', '우원재', '코드 쿤스트',
+        // Korean Solo/Pop
         '아이유', 'IU', '태연', 'TAEYEON', '헤이즈', 'Heize', '볼빨간사춘기', '악동뮤지션', 'AKMU', '멜로망스', '폴킴', 'Paul Kim', '성시경', '이적', '정승환', '소란', '10CM',
         '윤하', 'YOUNHA', '이하이', 'LEE HI', '선미', 'SUNMI', '청하', 'CHUNGHA', 'BIBI', '유빈', 'Yubin', '제시', 'Jessi',
+        // Korean Bands
         '넬', 'NELL', '데이식스', 'DAY6', '엔플라잉', 'N.Flying', '씨엔블루', 'CNBLUE', 'FT아일랜드', 'FTISLAND',
-        'Yiruma', '이루마', '조성진', '손열음', '임윤찬'
+        // Korean Classical/Instrumental
+        'Yiruma', '이루마', '조성진', '손열음', '임윤찬',
+        // Korean EDM/Electronic
+        '페기 구', 'Peggy Gou', '투컷',
+        // Korean Jazz
+        '나윤선', '말로', '웅산', '재즈피아노 윤석철'
     ],
 
     // Genre-based artist recommendations
@@ -105,6 +116,94 @@ const MUSIC_DATABASE = {
         '자이언티': ['딘', '크러쉬', 'pH-1', '우원재', 'DEAN']
     },
 
+    // Artist name aliases (Korean <-> English) to prevent duplicates
+    artistAliases: {
+        '아이유': 'IU', 'IU': '아이유',
+        '태연': 'TAEYEON', 'TAEYEON': '태연',
+        '헤이즈': 'Heize', 'Heize': '헤이즈',
+        '크러쉬': 'Crush', 'Crush': '크러쉬',
+        '딘': 'DEAN', 'DEAN': '딘',
+        '박재범': 'Jay Park', 'Jay Park': '박재범',
+        '창모': 'CHANGMO', 'CHANGMO': '창모',
+        '빈지노': 'Beenzino', 'Beenzino': '빈지노',
+        '식케이': 'Sik-K', 'Sik-K': '식케이',
+        '기리보이': 'Giriboy', 'Giriboy': '기리보이',
+        '윤하': 'YOUNHA', 'YOUNHA': '윤하',
+        '이하이': 'LEE HI', 'LEE HI': '이하이',
+        '선미': 'SUNMI', 'SUNMI': '선미',
+        '청하': 'CHUNGHA', 'CHUNGHA': '청하',
+        '유빈': 'Yubin', 'Yubin': '유빈',
+        '제시': 'Jessi', 'Jessi': '제시',
+        '넬': 'NELL', 'NELL': '넬',
+        '데이식스': 'DAY6', 'DAY6': '데이식스',
+        '엔플라잉': 'N.Flying', 'N.Flying': '엔플라잉',
+        '씨엔블루': 'CNBLUE', 'CNBLUE': '씨엔블루',
+        '이루마': 'Yiruma', 'Yiruma': '이루마',
+        '혁오': 'HYUKOH', 'HYUKOH': '혁오',
+        '악동뮤지션': 'AKMU', 'AKMU': '악동뮤지션',
+        '폴킴': 'Paul Kim', 'Paul Kim': '폴킴',
+        '페기 구': 'Peggy Gou', 'Peggy Gou': '페기 구'
+    },
+
+    // Artist descriptions (genre, mood, style)
+    artistDescriptions: {
+        // K-Pop
+        'BTS': '글로벌 K-Pop | 힙합 & 팝 | 에너지 넘치는',
+        'BLACKPINK': 'K-Pop 걸그룹 | 강렬한 비트 | 파워풀',
+        'NewJeans': 'Y2K 감성 | 청량한 팝 | 트렌디',
+        'aespa': 'K-Pop | 사이버펑크 | 강렬한 일렉트로',
+        'IVE': 'K-Pop 걸그룹 | 세련된 팝 | 자신감 넘치는',
+        'LE SSERAFIM': 'K-Pop | 다크 팝 | 카리스마',
+        'Stray Kids': 'K-Pop | 힙합 & EDM | 에너지 폭발',
+        'SEVENTEEN': 'K-Pop 보이그룹 | 다이나믹 퍼포먼스 | 희망찬',
+        // 한국 인디
+        '혁오': '사이키델릭 록 | 레트로 | 몽환적인',
+        '실리카겔': '일렉트로닉 록 | 실험적 | 공간감 있는',
+        '새소년': '록 밴드 | 에너지틱 | 반항적인',
+        '잔나비': '레트로 팝 | 서정적 | 낭만적인',
+        '검정치마': '인디 록 | 감성적 | 몽환적인',
+        '백예린': '어반 R&B | 감성적 | 부드러운',
+        '선우정아': '아트 팝 | 실험적 | 독특한',
+        '소란': '어쿠스틱 팝 | 청량한 | 따뜻한',
+        '10CM': '어쿠스틱 팝 | 감성적 | 편안한',
+        '멜로망스': '발라드 듀오 | 서정적 | 감미로운',
+        // 힙합/R&B
+        '자이언티': '어반 R&B | 감각적 | 세련된',
+        '딘': 'R&B | 몽환적 | 세련된',
+        '크러쉬': 'R&B | 소울풀 | 로맨틱',
+        'pH-1': '힙합 | 스웩 | 트렌디',
+        '창모': '힙합 | 다크 | 강렬한',
+        // 해외
+        'Taylor Swift': 'Pop/Country | 서사적 | 감성적',
+        'The Weeknd': 'R&B/Synth-pop | 다크 | 중독적',
+        'Billie Eilish': 'Alt-Pop | 어두운 | 속삭이는',
+        'Drake': 'Hip-Hop/R&B | 감성 래핑 | 부드러운',
+        'Dua Lipa': 'Pop/Disco | 댄서블 | 레트로',
+        'Ed Sheeran': 'Pop/Folk | 어쿠스틱 | 따뜻한'
+    },
+
+    // Song descriptions (mood, recommended for)
+    songDescriptions: {
+        // K-Pop
+        'Dynamite - BTS': '펑키 디스코 팝 | 신나는 비트',
+        'Super Shy - NewJeans': 'Y2K 팝 | 청량하고 중독적',
+        'Spicy - aespa': '하이퍼팝 | 강렬하고 독특한',
+        'I AM - IVE': '자신감 넘치는 팝 | 파워풀',
+        // 한국 인디
+        'TOMBOY - 혁오': '레트로 록 | 몽환적인 그루브',
+        '디저트 - 실리카겔': '일렉트로닉 록 | 공간감 있는',
+        '주저하는 연인들을 위해 - 잔나비': '레트로 팝 | 로맨틱하고 따뜻한',
+        'Bye bye my blue - 백예린': '어반 R&B | 감성적이고 쓸쓸한',
+        '아마추어 - 10CM': '어쿠스틱 팝 | 설레는 감성',
+        // 발라드
+        '좋을텐데 - 성시경': '서정 발라드 | 그리움과 위로',
+        '하늘을 달리다 - 이적': '록 발라드 | 희망적이고 웅장한',
+        // 해외
+        'Blinding Lights - The Weeknd': '신스팝 | 레트로 80s 느낌',
+        'Anti-Hero - Taylor Swift': '인디팝 | 자기성찰적',
+        'Levitating - Dua Lipa': '디스코 팝 | 신나는 댄스곡'
+    },
+
     // Lesser-known/newer artists get priority (higher = less known, prioritized)
     artistPriority: {
         // 신예/덜 알려진 아티스트 (높은 점수)
@@ -140,6 +239,11 @@ let appState = {
     artists: [],
     songs: [],
     recommendations: {
+        koreanArtists: [],
+        internationalArtists: [],
+        koreanSongs: [],
+        internationalSongs: [],
+        // Legacy compatibility
         artists: [],
         songs: []
     },
@@ -488,41 +592,28 @@ function renderSongs() {
 }
 
 function renderRecommendations() {
-    renderRecommendedArtists();
-    renderRecommendedSongs();
+    renderCategoryRecommendations('korean-artists', appState.recommendations.koreanArtists || [], 'artist');
+    renderCategoryRecommendations('intl-artists', appState.recommendations.internationalArtists || [], 'artist');
+    renderCategoryRecommendations('korean-songs', appState.recommendations.koreanSongs || [], 'song');
+    renderCategoryRecommendations('intl-songs', appState.recommendations.internationalSongs || [], 'song');
 }
 
-function renderRecommendedArtists() {
-    const container = document.getElementById('recommended-artists');
-    const emptyMsg = document.getElementById('rec-artists-empty');
+function renderCategoryRecommendations(category, items, type) {
+    const container = document.getElementById(`recommended-${category}`);
+    const emptyMsg = document.getElementById(`rec-${category}-empty`);
 
-    if (appState.recommendations.artists.length === 0) {
+    if (!container || !emptyMsg) return;
+
+    if (items.length === 0) {
         container.innerHTML = '';
         emptyMsg.style.display = 'block';
         return;
     }
 
     emptyMsg.style.display = 'none';
-    container.innerHTML = appState.recommendations.artists.map((item, index) => {
-        const existingRating = appState.ratings.find(r => r.type === 'artist' && r.name === item.name);
-        return createRecommendationCard(item, 'artist', index, existingRating?.rating);
-    }).join('');
-}
-
-function renderRecommendedSongs() {
-    const container = document.getElementById('recommended-songs');
-    const emptyMsg = document.getElementById('rec-songs-empty');
-
-    if (appState.recommendations.songs.length === 0) {
-        container.innerHTML = '';
-        emptyMsg.style.display = 'block';
-        return;
-    }
-
-    emptyMsg.style.display = 'none';
-    container.innerHTML = appState.recommendations.songs.map((item, index) => {
-        const existingRating = appState.ratings.find(r => r.type === 'song' && r.name === item.name);
-        return createRecommendationCard(item, 'song', index, existingRating?.rating);
+    container.innerHTML = items.map((item, index) => {
+        const existingRating = appState.ratings.find(r => r.type === type && r.name === item.name);
+        return createRecommendationCard(item, type, index, existingRating?.rating);
     }).join('');
 }
 
@@ -536,6 +627,14 @@ function createRecommendationCard(item, type, index, existingRating) {
         { value: 1, label: '완전 별로', icon: '😩' }
     ];
 
+    // Get description from database
+    let description = '';
+    if (type === 'artist') {
+        description = MUSIC_DATABASE.artistDescriptions[item.name] || '';
+    } else {
+        description = MUSIC_DATABASE.songDescriptions[item.name] || '';
+    }
+
     return `
         <div class="recommendation-item" data-type="${type}" data-index="${index}">
             <div class="rec-header">
@@ -543,6 +642,7 @@ function createRecommendationCard(item, type, index, existingRating) {
                 <div class="rec-info">
                     <h4>${item.name}</h4>
                     <p>${item.reason}</p>
+                    ${description ? `<p class="rec-description">${description}</p>` : ''}
                 </div>
             </div>
             <div class="rec-match">
@@ -766,11 +866,25 @@ function getRecommendations() {
         return;
     }
 
-    const recommendedArtists = generateArtistRecommendations();
-    const recommendedSongs = generateSongRecommendations();
+    // Generate all recommendations
+    const allArtists = generateArtistRecommendations(30);
+    const allSongs = generateSongRecommendations(30);
 
-    appState.recommendations.artists = recommendedArtists;
-    appState.recommendations.songs = recommendedSongs;
+    // Split by Korean/International
+    const koreanArtists = allArtists.filter(a => a.isKorean).slice(0, 8);
+    const internationalArtists = allArtists.filter(a => !a.isKorean).slice(0, 8);
+    const koreanSongs = allSongs.filter(s => s.isKorean).slice(0, 8);
+    const internationalSongs = allSongs.filter(s => !s.isKorean).slice(0, 8);
+
+    // Update state
+    appState.recommendations.koreanArtists = koreanArtists;
+    appState.recommendations.internationalArtists = internationalArtists;
+    appState.recommendations.koreanSongs = koreanSongs;
+    appState.recommendations.internationalSongs = internationalSongs;
+
+    // Legacy compatibility
+    appState.recommendations.artists = [...koreanArtists, ...internationalArtists];
+    appState.recommendations.songs = [...koreanSongs, ...internationalSongs];
 
     saveToStorage();
     renderRecommendations();
@@ -787,34 +901,31 @@ function refreshRecommendations() {
         return;
     }
 
-    // Get current recommendation names to exclude
-    const currentArtistNames = appState.recommendations.artists.map(r => r.name);
-    const currentSongNames = appState.recommendations.songs.map(r => r.name);
+    // Get current recommendation names to exclude (both Korean and international)
+    const currentKoreanArtistNames = (appState.recommendations.koreanArtists || []).map(r => r.name);
+    const currentIntlArtistNames = (appState.recommendations.internationalArtists || []).map(r => r.name);
+    const currentKoreanSongNames = (appState.recommendations.koreanSongs || []).map(r => r.name);
+    const currentIntlSongNames = (appState.recommendations.internationalSongs || []).map(r => r.name);
 
-    // Generate more recommendations and filter out current ones
-    const allArtists = generateArtistRecommendations(20);
-    const allSongs = generateSongRecommendations(20);
+    // Generate more recommendations
+    const allArtists = generateArtistRecommendations(40);
+    const allSongs = generateSongRecommendations(40);
 
-    // Filter to get new recommendations
-    const newArtists = allArtists.filter(r => !currentArtistNames.includes(r.name)).slice(0, 8);
-    const newSongs = allSongs.filter(r => !currentSongNames.includes(r.name)).slice(0, 8);
+    // Split by Korean/International and filter out current ones
+    const newKoreanArtists = allArtists.filter(a => a.isKorean && !currentKoreanArtistNames.includes(a.name)).slice(0, 8);
+    const newIntlArtists = allArtists.filter(a => !a.isKorean && !currentIntlArtistNames.includes(a.name)).slice(0, 8);
+    const newKoreanSongs = allSongs.filter(s => s.isKorean && !currentKoreanSongNames.includes(s.name)).slice(0, 8);
+    const newIntlSongs = allSongs.filter(s => !s.isKorean && !currentIntlSongNames.includes(s.name)).slice(0, 8);
 
-    // If not enough new ones, add some from current (shuffled)
-    if (newArtists.length < 8) {
-        const remaining = allArtists.filter(r => currentArtistNames.includes(r.name))
-            .sort(() => Math.random() - 0.5)
-            .slice(0, 8 - newArtists.length);
-        newArtists.push(...remaining);
-    }
-    if (newSongs.length < 8) {
-        const remaining = allSongs.filter(r => currentSongNames.includes(r.name))
-            .sort(() => Math.random() - 0.5)
-            .slice(0, 8 - newSongs.length);
-        newSongs.push(...remaining);
-    }
+    // Update state
+    appState.recommendations.koreanArtists = newKoreanArtists;
+    appState.recommendations.internationalArtists = newIntlArtists;
+    appState.recommendations.koreanSongs = newKoreanSongs;
+    appState.recommendations.internationalSongs = newIntlSongs;
 
-    appState.recommendations.artists = newArtists;
-    appState.recommendations.songs = newSongs;
+    // Legacy compatibility
+    appState.recommendations.artists = [...newKoreanArtists, ...newIntlArtists];
+    appState.recommendations.songs = [...newKoreanSongs, ...newIntlSongs];
 
     saveToStorage();
     renderRecommendations();
@@ -824,17 +935,31 @@ function refreshRecommendations() {
 function generateArtistRecommendations(maxCount = 8) {
     const candidates = new Map(); // name -> { score, reasons }
 
-    // Get list of already rated artists to exclude
-    const ratedArtists = appState.ratings
+    // Get list of already rated artists to exclude (including aliases)
+    const ratedArtists = new Set();
+    appState.ratings
         .filter(r => r.type === 'artist')
-        .map(r => r.name);
+        .forEach(r => {
+            ratedArtists.add(r.name);
+            // Also add the alias if exists
+            const alias = MUSIC_DATABASE.artistAliases[r.name];
+            if (alias) ratedArtists.add(alias);
+        });
+
+    // Helper to check if artist or its alias is rated
+    const isRatedOrAlias = (artist) => {
+        if (ratedArtists.has(artist)) return true;
+        const alias = MUSIC_DATABASE.artistAliases[artist];
+        if (alias && ratedArtists.has(alias)) return true;
+        return false;
+    };
 
     // 1. Genre-based recommendations
     appState.selectedGenres.forEach(genre => {
         const artists = MUSIC_DATABASE.artistsByGenre[genre] || [];
         artists.forEach(artist => {
-            // Exclude user's artists AND already rated artists
-            if (!appState.artists.includes(artist) && !ratedArtists.includes(artist)) {
+            // Exclude user's artists AND already rated artists (including aliases)
+            if (!appState.artists.includes(artist) && !isRatedOrAlias(artist)) {
                 const current = candidates.get(artist) || { score: 0, reasons: [] };
                 current.score += 3;
                 current.reasons.push(`${genre} 장르`);
@@ -847,8 +972,8 @@ function generateArtistRecommendations(maxCount = 8) {
     appState.artists.forEach(userArtist => {
         const similar = MUSIC_DATABASE.similarArtists[userArtist] || [];
         similar.forEach(artist => {
-            // Exclude user's artists AND already rated artists
-            if (!appState.artists.includes(artist) && !ratedArtists.includes(artist)) {
+            // Exclude user's artists AND already rated artists (including aliases)
+            if (!appState.artists.includes(artist) && !isRatedOrAlias(artist)) {
                 const current = candidates.get(artist) || { score: 0, reasons: [] };
                 current.score += 2;
                 current.reasons.push(`${userArtist}와 유사`);
@@ -984,8 +1109,12 @@ function generateSongRecommendations(maxCount = 8) {
     // 4. Apply Korean song bonus for prioritization
     const koreanSongBonus = 5; // Significant bonus for Korean songs
     candidates.forEach((data, song) => {
-        // Check if song is Korean (has Korean characters in title or artist name)
-        const isKorean = /[\uAC00-\uD7AF]/.test(song);
+        // Extract artist from song name (format: "Song Title - Artist")
+        const artistMatch = song.match(/- (.+)$/);
+        const artist = artistMatch ? artistMatch[1].trim() : '';
+        // Check if artist is Korean (by nationality, not by name characters)
+        const isKorean = MUSIC_DATABASE.koreanArtists.includes(artist) || /[\uAC00-\uD7AF]/.test(artist);
+        data.isKoreanSong = isKorean; // Store for later use
         if (isKorean) {
             data.score += koreanSongBonus;
             if (!data.reasons.includes('한국 음악')) {
@@ -1012,7 +1141,7 @@ function generateSongRecommendations(maxCount = 8) {
             name,
             reason: data.reasons.slice(0, 2).join(', '),
             matchScore: Math.min(100, Math.round((data.score / 10) * 100)),
-            isKorean: /[\uAC00-\uD7AF]/.test(name),
+            isKorean: data.isKoreanSong || false, // Use stored nationality check
             songYear: MUSIC_DATABASE.songYears[name] || 2020,
             randomFactor: Math.random() // Add randomness for shuffle
         }))

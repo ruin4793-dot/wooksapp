@@ -721,6 +721,16 @@ body {
     color: var(--color-text-muted);
 }
 
+.rec-info .rec-description {
+    font-size: 0.75rem;
+    color: var(--color-accent);
+    background: rgba(139, 92, 246, 0.1);
+    padding: 4px 8px;
+    border-radius: var(--radius-sm);
+    margin-top: 4px;
+    display: inline-block;
+}
+
 .rec-match {
     display: flex;
     align-items: center;
