@@ -748,14 +748,20 @@ function getRecommendations() {
     showToast('추천이 완료되었습니다!');
 }
 
-function generateArtistRecommendations() {
+function generateArtistRecommendations(maxCount = 8) {
     const candidates = new Map(); // name -> { score, reasons }
+
+    // Get list of already rated artists to exclude
+    const ratedArtists = appState.ratings
+        .filter(r => r.type === 'artist')
+        .map(r => r.name);
 
     // 1. Genre-based recommendations
     appState.selectedGenres.forEach(genre => {
         const artists = MUSIC_DATABASE.artistsByGenre[genre] || [];
         artists.forEach(artist => {
-            if (!appState.artists.includes(artist)) {
+            // Exclude user's artists AND already rated artists
+            if (!appState.artists.includes(artist) && !ratedArtists.includes(artist)) {
                 const current = candidates.get(artist) || { score: 0, reasons: [] };
                 current.score += 3;
                 current.reasons.push(`${genre} 장르`);
@@ -768,7 +774,8 @@ function generateArtistRecommendations() {
     appState.artists.forEach(userArtist => {
         const similar = MUSIC_DATABASE.similarArtists[userArtist] || [];
         similar.forEach(artist => {
-            if (!appState.artists.includes(artist)) {
+            // Exclude user's artists AND already rated artists
+            if (!appState.artists.includes(artist) && !ratedArtists.includes(artist)) {
                 const current = candidates.get(artist) || { score: 0, reasons: [] };
                 current.score += 2;
                 current.reasons.push(`${userArtist}와 유사`);
@@ -826,19 +833,25 @@ function generateArtistRecommendations() {
             // Secondary sort: by match score
             return b.matchScore - a.matchScore;
         })
-        .slice(0, 8);
+        .slice(0, maxCount);
 
     return results;
 }
 
-function generateSongRecommendations() {
+function generateSongRecommendations(maxCount = 8) {
     const candidates = new Map();
+
+    // Get list of already rated songs to exclude
+    const ratedSongs = appState.ratings
+        .filter(r => r.type === 'song')
+        .map(r => r.name);
 
     // 1. Genre-based recommendations
     appState.selectedGenres.forEach(genre => {
         const songs = MUSIC_DATABASE.songsByGenre[genre] || [];
         songs.forEach(song => {
-            if (!appState.songs.includes(song)) {
+            // Exclude user's songs AND already rated songs
+            if (!appState.songs.includes(song) && !ratedSongs.includes(song)) {
                 const current = candidates.get(song) || { score: 0, reasons: [] };
                 current.score += 3;
                 current.reasons.push(`${genre} 장르`);
@@ -850,7 +863,8 @@ function generateSongRecommendations() {
     // 2. Artist-based recommendations
     appState.artists.forEach(artist => {
         Object.values(MUSIC_DATABASE.songsByGenre).flat().forEach(song => {
-            if (song.includes(artist) && !appState.songs.includes(song)) {
+            // Exclude user's songs AND already rated songs
+            if (song.includes(artist) && !appState.songs.includes(song) && !ratedSongs.includes(song)) {
                 const current = candidates.get(song) || { score: 0, reasons: [] };
                 current.score += 4;
                 current.reasons.push(`${artist}의 곡`);
@@ -906,13 +920,13 @@ function generateSongRecommendations() {
             // Secondary sort: by match score
             return b.matchScore - a.matchScore;
         })
-        .slice(0, 8);
+        .slice(0, maxCount);
 
     return results;
 }
 
 function rateRecommendation(type, name, rating) {
-    // Remove existing rating for this item
+    // Remove existing rating for this item if any
     const existingIndex = appState.ratings.findIndex(r => r.type === type && r.name === name);
     if (existingIndex !== -1) {
         appState.ratings.splice(existingIndex, 1);
@@ -920,6 +934,33 @@ function rateRecommendation(type, name, rating) {
 
     // Add new rating
     appState.ratings.push({ type, name, rating, timestamp: Date.now() });
+
+    // Remove rated item from current recommendations
+    if (type === 'artist') {
+        appState.recommendations.artists = appState.recommendations.artists.filter(r => r.name !== name);
+
+        // Generate one more recommendation to replace the rated one
+        const newRecommendations = generateArtistRecommendations(appState.recommendations.artists.length + 1);
+        // Find a new recommendation that's not already in the list
+        const newRec = newRecommendations.find(r =>
+            !appState.recommendations.artists.some(existing => existing.name === r.name)
+        );
+        if (newRec) {
+            appState.recommendations.artists.push(newRec);
+        }
+    } else if (type === 'song') {
+        appState.recommendations.songs = appState.recommendations.songs.filter(r => r.name !== name);
+
+        // Generate one more recommendation to replace the rated one
+        const newRecommendations = generateSongRecommendations(appState.recommendations.songs.length + 1);
+        // Find a new recommendation that's not already in the list
+        const newRec = newRecommendations.find(r =>
+            !appState.recommendations.songs.some(existing => existing.name === r.name)
+        );
+        if (newRec) {
+            appState.recommendations.songs.push(newRec);
+        }
+    }
 
     saveToStorage();
     renderRecommendations();
