@@ -29,53 +29,64 @@ const db = firebase.firestore();
 // Music Database (for recommendations)
 const MUSIC_DATABASE = {
     genres: [
-        'K-Pop', 'Pop', 'Hip-Hop', 'R&B', 'Rock', 'Indie',
+        'K-Pop', 'Pop', 'Hip-Hop', 'R&B', 'Rock', '한국인디',
         'Jazz', 'Classical', 'EDM', 'Ballad', 'Folk', 'Metal',
         'Reggae', 'Blues', 'Country', 'Funk', 'Soul', 'Disco'
     ],
 
+    // Korean artists list for prioritization
+    koreanArtists: [
+        'BTS', 'BLACKPINK', 'NewJeans', 'aespa', 'Stray Kids', 'IVE', 'LE SSERAFIM', 'SEVENTEEN', 'NCT', 'Red Velvet', 'EXO', 'TWICE', '(G)I-DLE', 'ITZY', 'TXT',
+        '혁오', '실리카겔', '새소년', '잔나비', 'HYUKOH', '검정치마', '선우정아', '백예린', '오혁', '박혜진', '이랑', '황소윤', 'CIFIKA', '키라라',
+        '자이언티', '딘', 'DEAN', '크러쉬', 'Crush', 'pH-1', '박재범', 'Jay Park', '염따', '창모', 'CHANGMO', 'The Quiett', '빈지노', 'Beenzino', '식케이', 'Sik-K', '기리보이', 'Giriboy', '우원재', '코드 쿤스트',
+        '아이유', 'IU', '태연', 'TAEYEON', '헤이즈', 'Heize', '볼빨간사춘기', '악동뮤지션', 'AKMU', '멜로망스', '폴킴', 'Paul Kim', '성시경', '이적', '정승환', '소란', '10CM',
+        '윤하', 'YOUNHA', '이하이', 'LEE HI', '선미', 'SUNMI', '청하', 'CHUNGHA', 'BIBI', '유빈', 'Yubin', '제시', 'Jessi',
+        '넬', 'NELL', '데이식스', 'DAY6', '엔플라잉', 'N.Flying', '씨엔블루', 'CNBLUE', 'FT아일랜드', 'FTISLAND',
+        'Yiruma', '이루마', '조성진', '손열음', '임윤찬'
+    ],
+
     // Genre-based artist recommendations
     artistsByGenre: {
-        'K-Pop': ['BTS', 'BLACKPINK', 'NewJeans', 'aespa', 'Stray Kids', 'IVE', 'LE SSERAFIM', 'SEVENTEEN', 'NCT', 'Red Velvet', 'EXO', 'TWICE', '(G)I-DLE', 'ITZY', 'TXT'],
-        'Pop': ['Taylor Swift', 'Ed Sheeran', 'Dua Lipa', 'The Weeknd', 'Harry Styles', 'Billie Eilish', 'Ariana Grande', 'Bruno Mars', 'SZA', 'Olivia Rodrigo'],
-        'Hip-Hop': ['Drake', 'Kendrick Lamar', 'J. Cole', 'Travis Scott', 'Tyler, The Creator', 'Kanye West', '21 Savage', 'Metro Boomin', 'Post Malone', 'Doja Cat'],
-        'R&B': ['The Weeknd', 'Frank Ocean', 'SZA', 'Daniel Caesar', 'H.E.R.', 'Jhené Aiko', 'Summer Walker', 'Brent Faiyaz', 'Khalid', 'Giveon'],
-        'Rock': ['Arctic Monkeys', 'The 1975', 'Imagine Dragons', 'Twenty One Pilots', 'Green Day', 'Foo Fighters', 'Coldplay', 'Muse', 'Radiohead', 'The Killers'],
-        'Indie': ['Tame Impala', 'Mac DeMarco', 'Clairo', 'Steve Lacy', 'Rex Orange County', 'Men I Trust', 'Boy Pablo', 'Bedroom', 'Still Woozy', 'beabadoobee'],
-        'Jazz': ['Robert Glasper', 'Kamasi Washington', 'Snarky Puppy', 'Jacob Collier', 'Esperanza Spalding', 'Joey Alexander', 'Norah Jones', 'Diana Krall', 'Chet Baker', 'Miles Davis'],
-        'Classical': ['Yiruma', 'Ludovico Einaudi', 'Lang Lang', 'Yo-Yo Ma', 'André Rieu', 'Murray Perahia', 'Hilary Hahn', 'Max Richter', 'Ólafur Arnalds', 'Joep Beving'],
-        'EDM': ['Avicii', 'Martin Garrix', 'Calvin Harris', 'David Guetta', 'Kygo', 'Tiësto', 'Marshmello', 'Zedd', 'Illenium', 'ODESZA'],
-        'Ballad': ['Adele', 'Sam Smith', 'John Legend', 'Lewis Capaldi', 'Lauv', 'James Arthur', 'Christina Perri', 'James Bay', 'Passenger', 'Dean Lewis'],
-        'Folk': ['Mumford & Sons', 'Bon Iver', 'Fleet Foxes', 'Iron & Wine', 'Vance Joy', 'The Lumineers', 'Of Monsters and Men', 'Hozier', 'Phoebe Bridgers', 'Father John Misty'],
+        'K-Pop': ['BTS', 'BLACKPINK', 'NewJeans', 'aespa', 'Stray Kids', 'IVE', 'LE SSERAFIM', 'SEVENTEEN', 'NCT', 'Red Velvet', 'EXO', 'TWICE', '(G)I-DLE', 'ITZY', 'TXT', 'NMIXX', 'tripleS', 'KISS OF LIFE', 'ILLIT', 'BABYMONSTER'],
+        'Pop': ['아이유', '태연', '백예린', '헤이즈', '볼빨간사춘기', '폴킴', '악동뮤지션', '멜로망스', '청하', '선미', 'Taylor Swift', 'Ed Sheeran', 'Dua Lipa', 'The Weeknd', 'Harry Styles', 'Billie Eilish', 'Ariana Grande', 'Bruno Mars'],
+        'Hip-Hop': ['자이언티', '딘', '크러쉬', 'pH-1', '박재범', '염따', '창모', 'The Quiett', '빈지노', '식케이', '기리보이', '우원재', '코드 쿤스트', 'Drake', 'Kendrick Lamar', 'Travis Scott', 'Tyler, The Creator'],
+        'R&B': ['딘', '크러쉬', '헤이즈', '백예린', '자이언티', 'DEAN', 'Crush', 'Heize', 'BIBI', '이하이', 'The Weeknd', 'Frank Ocean', 'SZA', 'Daniel Caesar', 'H.E.R.'],
+        'Rock': ['넬', '데이식스', '엔플라잉', '씨엔블루', 'FT아일랜드', 'NELL', 'DAY6', 'N.Flying', 'Arctic Monkeys', 'The 1975', 'Imagine Dragons', 'Twenty One Pilots', 'Green Day', 'Foo Fighters', 'Coldplay'],
+        '한국인디': ['혁오', '실리카겔', '새소년', '잔나비', '검정치마', '선우정아', '오혁', '백예린', '이랑', '황소윤', 'CIFIKA', '키라라', '소란', '10CM', '멜로망스', '정승환', '오왠', '샘김', '세이수미', '카더가든', '짙은'],
+        'Jazz': ['나윤선', '말로', '웅산', '재즈피아노 윤석철', 'Robert Glasper', 'Kamasi Washington', 'Snarky Puppy', 'Jacob Collier', 'Esperanza Spalding', 'Norah Jones'],
+        'Classical': ['이루마', '조성진', '손열음', '임윤찬', '신지아', 'Yiruma', 'Ludovico Einaudi', 'Lang Lang', 'Yo-Yo Ma', 'Max Richter'],
+        'EDM': ['페기 구', 'Peggy Gou', '투컷', '코드 쿤스트', 'Martin Garrix', 'Calvin Harris', 'David Guetta', 'Kygo', 'Tiësto', 'Marshmello', 'Zedd', 'Illenium'],
+        'Ballad': ['성시경', '이적', '정승환', '폴킴', '멜로망스', '윤하', '10CM', '소란', 'Adele', 'Sam Smith', 'John Legend', 'Lewis Capaldi', 'Lauv', 'James Arthur'],
+        'Folk': ['잔나비', '짙은', '옥상달빛', '소란', '포맨', 'Mumford & Sons', 'Bon Iver', 'Fleet Foxes', 'Iron & Wine', 'Vance Joy', 'The Lumineers', 'Hozier'],
         'Metal': ['Metallica', 'Iron Maiden', 'Slipknot', 'Avenged Sevenfold', 'Gojira', 'Ghost', 'Mastodon', 'Lamb of God', 'Trivium', 'Bullet For My Valentine'],
         'Reggae': ['Bob Marley', 'Damian Marley', 'Sean Paul', 'Shaggy', 'Chronixx', 'Protoje', 'Koffee', 'Skip Marley', 'Ziggy Marley', 'Stephen Marley'],
-        'Blues': ['Gary Clark Jr.', 'Joe Bonamassa', 'John Mayer', 'Stevie Ray Vaughan', 'B.B. King', 'Buddy Guy', 'Eric Clapton', 'Christone Kingfish Ingram', 'Kenny Wayne Shepherd', 'Robert Cray'],
-        'Country': ['Luke Combs', 'Morgan Wallen', 'Chris Stapleton', 'Kacey Musgraves', 'Zach Bryan', 'Luke Bryan', 'Carrie Underwood', 'Kane Brown', 'Thomas Rhett', 'Maren Morris'],
-        'Funk': ['Anderson .Paak', 'Vulfpeck', 'Bruno Mars', 'Thundercat', 'Jamiroquai', 'Chromeo', 'Daft Punk', 'Kool & The Gang', 'Earth, Wind & Fire', 'Prince'],
-        'Soul': ['Leon Bridges', 'Alicia Keys', 'John Legend', 'Erykah Badu', 'D\'Angelo', 'Lauryn Hill', 'Aretha Franklin', 'Stevie Wonder', 'Marvin Gaye', 'Amy Winehouse'],
-        'Disco': ['Dua Lipa', 'Daft Punk', 'Bee Gees', 'Donna Summer', 'Gloria Gaynor', 'Chic', 'KC and The Sunshine Band', 'Jessie Ware', 'Kylie Minogue', 'Róisín Murphy']
+        'Blues': ['Gary Clark Jr.', 'Joe Bonamassa', 'John Mayer', 'Stevie Ray Vaughan', 'B.B. King', 'Buddy Guy', 'Eric Clapton', 'Christone Kingfish Ingram'],
+        'Country': ['Luke Combs', 'Morgan Wallen', 'Chris Stapleton', 'Kacey Musgraves', 'Zach Bryan', 'Luke Bryan', 'Carrie Underwood', 'Kane Brown'],
+        'Funk': ['Anderson .Paak', 'Vulfpeck', 'Bruno Mars', 'Thundercat', 'Jamiroquai', 'Chromeo', 'Daft Punk', 'Kool & The Gang'],
+        'Soul': ['이하이', 'LEE HI', 'Leon Bridges', 'Alicia Keys', 'John Legend', 'Erykah Badu', 'D\'Angelo', 'Lauryn Hill', 'Aretha Franklin', 'Stevie Wonder'],
+        'Disco': ['Dua Lipa', 'Daft Punk', 'Bee Gees', 'Donna Summer', 'Gloria Gaynor', 'Chic', 'KC and The Sunshine Band', 'Jessie Ware']
     },
 
     // Genre-based song recommendations
     songsByGenre: {
-        'K-Pop': ['Dynamite - BTS', 'Pink Venom - BLACKPINK', 'Super Shy - NewJeans', 'Spicy - aespa', 'LALALALA - Stray Kids', 'I AM - IVE', 'ANTIFRAGILE - LE SSERAFIM', 'Super - SEVENTEEN', 'Queencard - (G)I-DLE', 'WANNABE - ITZY'],
-        'Pop': ['Anti-Hero - Taylor Swift', 'Shape of You - Ed Sheeran', 'Levitating - Dua Lipa', 'Blinding Lights - The Weeknd', 'As It Was - Harry Styles', 'bad guy - Billie Eilish', '7 rings - Ariana Grande', 'Uptown Funk - Bruno Mars'],
-        'Hip-Hop': ['God\'s Plan - Drake', 'HUMBLE. - Kendrick Lamar', 'No Role Modelz - J. Cole', 'SICKO MODE - Travis Scott', 'See You Again - Tyler, The Creator', 'Stronger - Kanye West', 'rockstar - Post Malone', 'Congratulations - Post Malone'],
-        'R&B': ['Blinding Lights - The Weeknd', 'Nights - Frank Ocean', 'Good Days - SZA', 'Best Part - Daniel Caesar', 'Focus - H.E.R.', 'Triggered - Jhené Aiko', 'Playing Games - Summer Walker', 'Dead Man Walking - Brent Faiyaz'],
-        'Rock': ['Do I Wanna Know? - Arctic Monkeys', 'Somebody Else - The 1975', 'Believer - Imagine Dragons', 'Stressed Out - Twenty One Pilots', 'Basket Case - Green Day', 'Everlong - Foo Fighters', 'Yellow - Coldplay', 'Supermassive Black Hole - Muse'],
-        'Indie': ['The Less I Know The Better - Tame Impala', 'Chamber of Reflection - Mac DeMarco', 'Sofia - Clairo', 'Bad Habit - Steve Lacy', 'Loving is Easy - Rex Orange County', 'Show Me How - Men I Trust', 'Everytime - Boy Pablo', 'Falls - ODESZA'],
-        'Jazz': ['Black Radio - Robert Glasper', 'The Epic - Kamasi Washington', 'Lingus - Snarky Puppy', 'Moon River - Jacob Collier', 'Don\'t Know Why - Norah Jones', 'My Funny Valentine - Chet Baker', 'So What - Miles Davis', 'Take Five - Dave Brubeck'],
-        'Classical': ['River Flows in You - Yiruma', 'Experience - Ludovico Einaudi', 'Clair de Lune - Debussy', 'Canon in D - Pachelbel', 'Moonlight Sonata - Beethoven', 'Spring - Vivaldi', 'On the Nature of Daylight - Max Richter', 'Gymnopédie No.1 - Erik Satie'],
-        'EDM': ['Wake Me Up - Avicii', 'Animals - Martin Garrix', 'Summer - Calvin Harris', 'Titanium - David Guetta', 'Firestone - Kygo', 'Red Lights - Tiësto', 'Alone - Marshmello', 'Clarity - Zedd', 'Illenium - Good Things Fall Apart', 'A Moment Apart - ODESZA'],
-        'Ballad': ['Someone Like You - Adele', 'Stay With Me - Sam Smith', 'All of Me - John Legend', 'Someone You Loved - Lewis Capaldi', 'I Like Me Better - Lauv', 'Say You Won\'t Let Go - James Arthur', 'A Thousand Years - Christina Perri', 'Let It Go - James Bay'],
-        'Folk': ['I Will Wait - Mumford & Sons', 'Skinny Love - Bon Iver', 'White Winter Hymnal - Fleet Foxes', 'Naked As We Came - Iron & Wine', 'Riptide - Vance Joy', 'Ho Hey - The Lumineers', 'Little Talks - Of Monsters and Men', 'Take Me to Church - Hozier'],
-        'Metal': ['Enter Sandman - Metallica', 'Fear of the Dark - Iron Maiden', 'Duality - Slipknot', 'Nightmare - Avenged Sevenfold', 'The Shooting Star - Gojira', 'Square Hammer - Ghost', 'Blood and Thunder - Mastodon', 'Redneck - Lamb of God'],
-        'Reggae': ['One Love - Bob Marley', 'Welcome to Jamrock - Damian Marley', 'Temperature - Sean Paul', 'It Wasn\'t Me - Shaggy', 'Smile Jamaica - Chronixx', 'Who Knows - Protoje', 'Rapture - Koffee', 'No More Trouble - Skip Marley'],
-        'Blues': ['Bright Lights - Gary Clark Jr.', 'Mountain Time - Joe Bonamassa', 'Gravity - John Mayer', 'Pride and Joy - Stevie Ray Vaughan', 'The Thrill Is Gone - B.B. King', 'Damn Right I\'ve Got the Blues - Buddy Guy', 'Layla - Eric Clapton'],
-        'Country': ['Fast Car - Luke Combs', 'Last Night - Morgan Wallen', 'Tennessee Whiskey - Chris Stapleton', 'Space Cowboy - Kacey Musgraves', 'Something in the Orange - Zach Bryan', 'Country Girl - Luke Bryan', 'Before He Cheats - Carrie Underwood'],
-        'Funk': ['Come Down - Anderson .Paak', 'Dean Town - Vulfpeck', 'Finesse - Bruno Mars', 'Them Changes - Thundercat', 'Virtual Insanity - Jamiroquai', 'Jealous - Chromeo', 'Get Lucky - Daft Punk', 'Celebration - Kool & The Gang'],
-        'Soul': ['Coming Home - Leon Bridges', 'Fallin\' - Alicia Keys', 'Ordinary People - John Legend', 'On & On - Erykah Badu', 'Untitled - D\'Angelo', 'Doo Wop - Lauryn Hill', 'Respect - Aretha Franklin', 'Superstition - Stevie Wonder'],
-        'Disco': ['Don\'t Start Now - Dua Lipa', 'Get Lucky - Daft Punk', 'Stayin\' Alive - Bee Gees', 'I Feel Love - Donna Summer', 'I Will Survive - Gloria Gaynor', 'Le Freak - Chic', 'That\'s the Way (I Like It) - KC and The Sunshine Band']
+        'K-Pop': ['Dynamite - BTS', 'Pink Venom - BLACKPINK', 'Super Shy - NewJeans', 'Spicy - aespa', 'LALALALA - Stray Kids', 'I AM - IVE', 'ANTIFRAGILE - LE SSERAFIM', 'Super - SEVENTEEN', 'Queencard - (G)I-DLE', 'WANNABE - ITZY', 'Hype Boy - NewJeans', 'Love Dive - IVE', 'Next Level - aespa', 'How You Like That - BLACKPINK'],
+        'Pop': ['좋은 날 - 아이유', '라일락 - 아이유', 'I - 태연', '비도 오고 그래서 - 헤이즈', '우주를 줄게 - 볼빨간사춘기', '모든 날 모든 순간 - 폴킴', '어떻게 이별까지 사랑하겠어 - 악동뮤지션', '선물 - 멜로망스', 'Anti-Hero - Taylor Swift', 'Shape of You - Ed Sheeran', 'Levitating - Dua Lipa'],
+        'Hip-Hop': ['양화대교 - 자이언티', '풀어 - 자이언티', 'instagram - 딘', '아름다워 - 크러쉬', 'Me Like Yuh - Jay Park', '빌어먹을 - 염따', '아름다워 - 창모', '랩스타 - The Quiett', 'God\'s Plan - Drake', 'HUMBLE. - Kendrick Lamar'],
+        'R&B': ['instagram - 딘', '아름다워 - 크러쉬', '비도 오고 그래서 - 헤이즈', '0310 - 백예린', '양화대교 - 자이언티', 'hangsang - BIBI', '한숨 - 이하이', 'Blinding Lights - The Weeknd', 'Nights - Frank Ocean', 'Good Days - SZA'],
+        'Rock': ['기억을 걷는 시간 - 넬', '예뻐지지 마 - 데이식스', '옥탑방 - 엔플라잉', '외톨이야 - 씨엔블루', 'Love Sick - FT아일랜드', 'Do I Wanna Know? - Arctic Monkeys', 'Somebody Else - The 1975', 'Believer - Imagine Dragons'],
+        '한국인디': ['TOMBOY - 혁오', 'Wi Fi - 혁오', '디저트 - 실리카겔', '아이러니하게도 - 실리카겔', '난춘 - 새소년', '주저하는 연인들을 위해 - 잔나비', '뜨거운 여름밤은 가고 남은 건 볼품없지만 - 잔나비', 'Everything - 검정치마', '춤 - 선우정아', 'Bye bye my blue - 백예린', '신의 놀이 - 이랑', 'For lovers who hesitate - 잔나비', '아마추어 - 10CM', '쏘아 - 10CM', '좋아 - 멜로망스'],
+        'Jazz': ['My Favorite Things - 나윤선', '버스 안에서 - 말로', 'Black Radio - Robert Glasper', 'The Epic - Kamasi Washington', 'Lingus - Snarky Puppy', 'Moon River - Jacob Collier', 'Don\'t Know Why - Norah Jones'],
+        'Classical': ['River Flows in You - 이루마', 'Kiss The Rain - 이루마', 'Polonaise Op.53 - 조성진', 'Experience - Ludovico Einaudi', 'Clair de Lune - Debussy', 'Canon in D - Pachelbel', 'Moonlight Sonata - Beethoven'],
+        'EDM': ['It Makes You Forget - Peggy Gou', 'Starlight - Peggy Gou', 'Wake Me Up - Avicii', 'Animals - Martin Garrix', 'Summer - Calvin Harris', 'Titanium - David Guetta', 'Firestone - Kygo', 'Alone - Marshmello'],
+        'Ballad': ['좋을텐데 - 성시경', '거리에서 - 성시경', '하늘을 달리다 - 이적', '너의 모든 순간 - 성시경', '나의 사랑 나의 곁에 - 폴킴', '모든 날 모든 순간 - 폴킴', '선물 - 멜로망스', '오래된 노래 - 정승환', 'Someone Like You - Adele', 'Stay With Me - Sam Smith', 'All of Me - John Legend'],
+        'Folk': ['주저하는 연인들을 위해 - 잔나비', '뜨거운 여름밤은 가고 - 잔나비', '수고했어 오늘도 - 옥상달빛', 'I Will Wait - Mumford & Sons', 'Skinny Love - Bon Iver', 'White Winter Hymnal - Fleet Foxes', 'Riptide - Vance Joy', 'Take Me to Church - Hozier'],
+        'Metal': ['Enter Sandman - Metallica', 'Fear of the Dark - Iron Maiden', 'Duality - Slipknot', 'Nightmare - Avenged Sevenfold', 'The Shooting Star - Gojira', 'Square Hammer - Ghost', 'Blood and Thunder - Mastodon'],
+        'Reggae': ['One Love - Bob Marley', 'Welcome to Jamrock - Damian Marley', 'Temperature - Sean Paul', 'It Wasn\'t Me - Shaggy', 'Smile Jamaica - Chronixx', 'Who Knows - Protoje', 'Rapture - Koffee'],
+        'Blues': ['Bright Lights - Gary Clark Jr.', 'Mountain Time - Joe Bonamassa', 'Gravity - John Mayer', 'Pride and Joy - Stevie Ray Vaughan', 'The Thrill Is Gone - B.B. King', 'Damn Right I\'ve Got the Blues - Buddy Guy'],
+        'Country': ['Fast Car - Luke Combs', 'Last Night - Morgan Wallen', 'Tennessee Whiskey - Chris Stapleton', 'Space Cowboy - Kacey Musgraves', 'Something in the Orange - Zach Bryan', 'Country Girl - Luke Bryan'],
+        'Funk': ['Come Down - Anderson .Paak', 'Dean Town - Vulfpeck', 'Finesse - Bruno Mars', 'Them Changes - Thundercat', 'Virtual Insanity - Jamiroquai', 'Jealous - Chromeo', 'Get Lucky - Daft Punk'],
+        'Soul': ['한숨 - 이하이', '홀로 - 이하이', 'Coming Home - Leon Bridges', 'Fallin\' - Alicia Keys', 'Ordinary People - John Legend', 'On & On - Erykah Badu', 'Respect - Aretha Franklin', 'Superstition - Stevie Wonder'],
+        'Disco': ['Don\'t Start Now - Dua Lipa', 'Get Lucky - Daft Punk', 'Stayin\' Alive - Bee Gees', 'I Feel Love - Donna Summer', 'I Will Survive - Gloria Gaynor', 'Le Freak - Chic']
     },
 
     // Similar artists mapping
@@ -786,14 +797,35 @@ function generateArtistRecommendations() {
         }
     });
 
-    // Convert to array and sort
+    // 4. Apply Korean artist bonus for prioritization
+    const koreanArtistBonus = 5; // Significant bonus for Korean artists
+    candidates.forEach((data, artist) => {
+        // Check if artist is Korean (in koreanArtists list or has Korean characters)
+        const isKorean = MUSIC_DATABASE.koreanArtists.includes(artist) ||
+            /[\uAC00-\uD7AF]/.test(artist); // Korean character range
+        if (isKorean) {
+            data.score += koreanArtistBonus;
+            if (!data.reasons.includes('한국 아티스트')) {
+                data.reasons.unshift('한국 아티스트');
+            }
+        }
+    });
+
+    // Convert to array and sort (Korean artists will naturally rise to top due to bonus)
     const results = Array.from(candidates.entries())
         .map(([name, data]) => ({
             name,
             reason: data.reasons.slice(0, 2).join(', '),
-            matchScore: Math.min(100, Math.round((data.score / 10) * 100))
+            matchScore: Math.min(100, Math.round((data.score / 10) * 100)),
+            isKorean: MUSIC_DATABASE.koreanArtists.includes(name) || /[\uAC00-\uD7AF]/.test(name)
         }))
-        .sort((a, b) => b.matchScore - a.matchScore)
+        .sort((a, b) => {
+            // Primary sort: Korean artists first
+            if (a.isKorean && !b.isKorean) return -1;
+            if (!a.isKorean && b.isKorean) return 1;
+            // Secondary sort: by match score
+            return b.matchScore - a.matchScore;
+        })
         .slice(0, 8);
 
     return results;
@@ -847,13 +879,33 @@ function generateSongRecommendations() {
         }
     });
 
+    // 4. Apply Korean song bonus for prioritization
+    const koreanSongBonus = 5; // Significant bonus for Korean songs
+    candidates.forEach((data, song) => {
+        // Check if song is Korean (has Korean characters in title or artist name)
+        const isKorean = /[\uAC00-\uD7AF]/.test(song);
+        if (isKorean) {
+            data.score += koreanSongBonus;
+            if (!data.reasons.includes('한국 음악')) {
+                data.reasons.unshift('한국 음악');
+            }
+        }
+    });
+
     const results = Array.from(candidates.entries())
         .map(([name, data]) => ({
             name,
             reason: data.reasons.slice(0, 2).join(', '),
-            matchScore: Math.min(100, Math.round((data.score / 10) * 100))
+            matchScore: Math.min(100, Math.round((data.score / 10) * 100)),
+            isKorean: /[\uAC00-\uD7AF]/.test(name)
         }))
-        .sort((a, b) => b.matchScore - a.matchScore)
+        .sort((a, b) => {
+            // Primary sort: Korean songs first
+            if (a.isKorean && !b.isKorean) return -1;
+            if (!a.isKorean && b.isKorean) return 1;
+            // Secondary sort: by match score
+            return b.matchScore - a.matchScore;
+        })
         .slice(0, 8);
 
     return results;
