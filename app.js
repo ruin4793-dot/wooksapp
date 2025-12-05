@@ -98,7 +98,39 @@ const MUSIC_DATABASE = {
         'The Weeknd': ['Dua Lipa', 'Bruno Mars', 'Post Malone', 'Khalid'],
         'Drake': ['J. Cole', 'Future', '21 Savage', 'Travis Scott'],
         'Billie Eilish': ['Olivia Rodrigo', 'Lorde', 'Clairo', 'girl in red'],
-        'Arctic Monkeys': ['The 1975', 'The Strokes', 'Tame Impala', 'Catfish and the Bottlemen']
+        'Arctic Monkeys': ['The 1975', 'The Strokes', 'Tame Impala', 'Catfish and the Bottlemen'],
+        '혁오': ['실리카겔', '새소년', '잔나비', '검정치마', 'CIFIKA'],
+        '잔나비': ['혁오', '짙은', '카더가든', '오왠', '소란'],
+        '아이유': ['태연', '헤이즈', '백예린', '청하', '선미'],
+        '자이언티': ['딘', '크러쉬', 'pH-1', '우원재', 'DEAN']
+    },
+
+    // Lesser-known/newer artists get priority (higher = less known, prioritized)
+    artistPriority: {
+        // 신예/덜 알려진 아티스트 (높은 점수)
+        'ILLIT': 10, 'BABYMONSTER': 10, 'tripleS': 10, 'KISS OF LIFE': 10,
+        '실리카겔': 9, '새소년': 9, 'CIFIKA': 9, '키라라': 9, '세이수미': 9,
+        '황소윤': 9, '이랑': 9, '오왠': 8, '카더가든': 8, '짙은': 8,
+        'pH-1': 8, '우원재': 8, '식케이': 8, '기리보이': 8,
+        '선우정아': 8, '백예린': 7, '소란': 7, '정승환': 7,
+        'NMIXX': 7, 'LE SSERAFIM': 6, 'IVE': 6, 'NewJeans': 5,
+        // 잘 알려진 아티스트 (낮은 점수)  
+        'BTS': 1, 'BLACKPINK': 1, '아이유': 2, 'EXO': 2, 'TWICE': 2
+    },
+
+    // Song release years (higher = newer, prioritized)
+    songYears: {
+        // 2024년
+        'Super Shy - NewJeans': 2023, 'I AM - IVE': 2023, 'LALALALA - Stray Kids': 2023,
+        '디저트 - 실리카겔': 2024, '아이러니하게도 - 실리카겔': 2023,
+        // 2023년
+        'Spicy - aespa': 2023, 'Queencard - (G)I-DLE': 2023, 'ANTIFRAGILE - LE SSERAFIM': 2022,
+        '난춘 - 새소년': 2023, 'Hype Boy - NewJeans': 2022, 'Love Dive - IVE': 2022,
+        // 2022년
+        'Next Level - aespa': 2021, 'TOMBOY - 혁오': 2016, 'Wi Fi - 혁오': 2021,
+        // 클래식/오래된 곡 (낮은 연도)
+        'Dynamite - BTS': 2020, 'Pink Venom - BLACKPINK': 2022,
+        '주저하는 연인들을 위해 - 잔나비': 2019, '좋은 날 - 아이유': 2010
     }
 };
 
@@ -748,6 +780,47 @@ function getRecommendations() {
     showToast('추천이 완료되었습니다!');
 }
 
+// Refresh recommendations with NEW items (excluding current ones)
+function refreshRecommendations() {
+    if (appState.selectedGenres.length === 0 && appState.artists.length === 0 && appState.songs.length === 0) {
+        showToast('먼저 장르, 아티스트 또는 노래를 추가해주세요');
+        return;
+    }
+
+    // Get current recommendation names to exclude
+    const currentArtistNames = appState.recommendations.artists.map(r => r.name);
+    const currentSongNames = appState.recommendations.songs.map(r => r.name);
+
+    // Generate more recommendations and filter out current ones
+    const allArtists = generateArtistRecommendations(20);
+    const allSongs = generateSongRecommendations(20);
+
+    // Filter to get new recommendations
+    const newArtists = allArtists.filter(r => !currentArtistNames.includes(r.name)).slice(0, 8);
+    const newSongs = allSongs.filter(r => !currentSongNames.includes(r.name)).slice(0, 8);
+
+    // If not enough new ones, add some from current (shuffled)
+    if (newArtists.length < 8) {
+        const remaining = allArtists.filter(r => currentArtistNames.includes(r.name))
+            .sort(() => Math.random() - 0.5)
+            .slice(0, 8 - newArtists.length);
+        newArtists.push(...remaining);
+    }
+    if (newSongs.length < 8) {
+        const remaining = allSongs.filter(r => currentSongNames.includes(r.name))
+            .sort(() => Math.random() - 0.5)
+            .slice(0, 8 - newSongs.length);
+        newSongs.push(...remaining);
+    }
+
+    appState.recommendations.artists = newArtists;
+    appState.recommendations.songs = newSongs;
+
+    saveToStorage();
+    renderRecommendations();
+    showToast('새로운 추천을 불러왔습니다!');
+}
+
 function generateArtistRecommendations(maxCount = 8) {
     const candidates = new Map(); // name -> { score, reasons }
 
@@ -818,20 +891,35 @@ function generateArtistRecommendations(maxCount = 8) {
         }
     });
 
-    // Convert to array and sort (Korean artists will naturally rise to top due to bonus)
-    const results = Array.from(candidates.entries())
+    // 5. Apply priority bonus for lesser-known/newer artists
+    candidates.forEach((data, artist) => {
+        const priorityBonus = MUSIC_DATABASE.artistPriority[artist] || 5; // Default medium priority
+        data.score += priorityBonus;
+        if (priorityBonus >= 8) {
+            if (!data.reasons.includes('신예 아티스트')) {
+                data.reasons.push('신예 아티스트');
+            }
+        }
+    });
+
+    // Convert to array and add randomization for variety
+    let results = Array.from(candidates.entries())
         .map(([name, data]) => ({
             name,
             reason: data.reasons.slice(0, 2).join(', '),
             matchScore: Math.min(100, Math.round((data.score / 10) * 100)),
-            isKorean: MUSIC_DATABASE.koreanArtists.includes(name) || /[\uAC00-\uD7AF]/.test(name)
+            isKorean: MUSIC_DATABASE.koreanArtists.includes(name) || /[\uAC00-\uD7AF]/.test(name),
+            priority: MUSIC_DATABASE.artistPriority[name] || 5,
+            randomFactor: Math.random() // Add randomness for shuffle
         }))
         .sort((a, b) => {
             // Primary sort: Korean artists first
             if (a.isKorean && !b.isKorean) return -1;
             if (!a.isKorean && b.isKorean) return 1;
-            // Secondary sort: by match score
-            return b.matchScore - a.matchScore;
+            // Secondary: lesser-known artists first (higher priority)
+            if (a.priority !== b.priority) return b.priority - a.priority;
+            // Tertiary: random factor for variety on refresh
+            return b.randomFactor - a.randomFactor;
         })
         .slice(0, maxCount);
 
@@ -906,19 +994,36 @@ function generateSongRecommendations(maxCount = 8) {
         }
     });
 
-    const results = Array.from(candidates.entries())
+    // 5. Apply priority bonus for newer songs
+    const currentYear = new Date().getFullYear();
+    candidates.forEach((data, song) => {
+        const songYear = MUSIC_DATABASE.songYears[song] || 2020; // Default to 2020 if unknown
+        const yearBonus = (songYear - 2015) * 0.5; // Newer songs get higher bonus
+        data.score += yearBonus;
+        if (songYear >= 2023) {
+            if (!data.reasons.includes('최신곡')) {
+                data.reasons.push('최신곡');
+            }
+        }
+    });
+
+    let results = Array.from(candidates.entries())
         .map(([name, data]) => ({
             name,
             reason: data.reasons.slice(0, 2).join(', '),
             matchScore: Math.min(100, Math.round((data.score / 10) * 100)),
-            isKorean: /[\uAC00-\uD7AF]/.test(name)
+            isKorean: /[\uAC00-\uD7AF]/.test(name),
+            songYear: MUSIC_DATABASE.songYears[name] || 2020,
+            randomFactor: Math.random() // Add randomness for shuffle
         }))
         .sort((a, b) => {
             // Primary sort: Korean songs first
             if (a.isKorean && !b.isKorean) return -1;
             if (!a.isKorean && b.isKorean) return 1;
-            // Secondary sort: by match score
-            return b.matchScore - a.matchScore;
+            // Secondary: newer songs first
+            if (a.songYear !== b.songYear) return b.songYear - a.songYear;
+            // Tertiary: random factor for variety on refresh
+            return b.randomFactor - a.randomFactor;
         })
         .slice(0, maxCount);
 
@@ -1046,7 +1151,7 @@ function setupEventListeners() {
 
     // Get recommendations
     document.getElementById('get-recommendations-btn').addEventListener('click', getRecommendations);
-    document.getElementById('refresh-recommendations-btn').addEventListener('click', getRecommendations);
+    document.getElementById('refresh-recommendations-btn').addEventListener('click', refreshRecommendations);
 
     // Edit Modal
     document.getElementById('modal-close').addEventListener('click', closeModal);
