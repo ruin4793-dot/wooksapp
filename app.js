@@ -146,9 +146,15 @@ function updateUserUI(user) {
     }
 }
 
-async function handleSignup(email, password) {
+// Helper function to convert username to email format
+function usernameToEmail(username) {
+    return `${username.toLowerCase().trim()}@musicmate.app`;
+}
+
+async function handleSignup(username, password) {
     try {
         showLoading();
+        const email = usernameToEmail(username);
         const userCredential = await auth.createUserWithEmailAndPassword(email, password);
         closeAuthModal();
         showToast('회원가입이 완료되었습니다!');
@@ -158,12 +164,13 @@ async function handleSignup(email, password) {
 
     } catch (error) {
         let message = '회원가입에 실패했습니다.';
+        console.error('Signup error:', error);
         if (error.code === 'auth/email-already-in-use') {
-            message = '이미 사용 중인 이메일입니다.';
+            message = '이미 사용 중인 아이디입니다.';
         } else if (error.code === 'auth/weak-password') {
             message = '비밀번호는 6자 이상이어야 합니다.';
         } else if (error.code === 'auth/invalid-email') {
-            message = '유효하지 않은 이메일 형식입니다.';
+            message = '아이디는 영문, 숫자만 사용 가능합니다.';
         }
         document.getElementById('signup-error').textContent = message;
     } finally {
@@ -171,20 +178,22 @@ async function handleSignup(email, password) {
     }
 }
 
-async function handleLogin(email, password) {
+async function handleLogin(username, password) {
     try {
         showLoading();
+        const email = usernameToEmail(username);
         await auth.signInWithEmailAndPassword(email, password);
         closeAuthModal();
         showToast('로그인되었습니다!');
     } catch (error) {
         let message = '로그인에 실패했습니다.';
+        console.error('Login error:', error);
         if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
-            message = '이메일 또는 비밀번호가 올바르지 않습니다.';
+            message = '아이디 또는 비밀번호가 올바르지 않습니다.';
         } else if (error.code === 'auth/invalid-email') {
-            message = '유효하지 않은 이메일 형식입니다.';
+            message = '아이디는 영문, 숫자만 사용 가능합니다.';
         } else if (error.code === 'auth/invalid-credential') {
-            message = '이메일 또는 비밀번호가 올바르지 않습니다.';
+            message = '아이디 또는 비밀번호가 올바르지 않습니다.';
         }
         document.getElementById('login-error').textContent = message;
     } finally {
@@ -287,7 +296,7 @@ function loadFromStorage() {
 
 function openAuthModal() {
     document.getElementById('auth-modal').classList.add('active');
-    document.getElementById('login-email').focus();
+    document.getElementById('login-username').focus();
 }
 
 function closeAuthModal() {
@@ -326,24 +335,30 @@ function setupAuthModal() {
     // Login form
     document.getElementById('login-form').addEventListener('submit', (e) => {
         e.preventDefault();
-        const email = document.getElementById('login-email').value;
+        const username = document.getElementById('login-username').value;
         const password = document.getElementById('login-password').value;
-        handleLogin(email, password);
+        handleLogin(username, password);
     });
 
     // Signup form
     document.getElementById('signup-form').addEventListener('submit', (e) => {
         e.preventDefault();
-        const email = document.getElementById('signup-email').value;
+        const username = document.getElementById('signup-username').value;
         const password = document.getElementById('signup-password').value;
         const confirmPassword = document.getElementById('signup-password-confirm').value;
+
+        // Validate username (only alphanumeric)
+        if (!/^[a-zA-Z0-9]+$/.test(username)) {
+            document.getElementById('signup-error').textContent = '아이디는 영문, 숫자만 사용 가능합니다.';
+            return;
+        }
 
         if (password !== confirmPassword) {
             document.getElementById('signup-error').textContent = '비밀번호가 일치하지 않습니다.';
             return;
         }
 
-        handleSignup(email, password);
+        handleSignup(username, password);
     });
 }
 

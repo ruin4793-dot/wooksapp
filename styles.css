@@ -1011,6 +1011,13 @@ body {
     min-height: 1.2em;
 }
 
+.form-hint {
+    display: block;
+    color: var(--color-text-dim);
+    font-size: 0.75rem;
+    margin-top: var(--spacing-xs);
+}
+
 /* Toast */
 .toast {
     position: fixed;
